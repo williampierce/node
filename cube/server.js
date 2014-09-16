@@ -1,6 +1,5 @@
 var http = require('http');
 var url = require('url');
-var querystring = require('querystring');
 
 function start(route, handle)
 {
@@ -9,7 +8,6 @@ function start(route, handle)
         var request_parse = url.parse(request.url);
         var pathname      = request_parse.pathname;
         var query         = request_parse.query;
-        var query_parse   = querystring.parse(query);
         var postedData    = "";
 
         function postData(chunk)
@@ -20,13 +18,13 @@ function start(route, handle)
 
         function postEnd()
         {
-            route(handle, pathname, response, postedData);
+            route(handle, pathname, query, postedData, response);
         }
 
         console.log("Request for " + pathname + " received.");
         console.log("  Method: " + request.method);
-        // console.log(query);
-        // console.log(query_parse);
+        console.log("  Pathname: " + pathname);
+        console.log("  Query: " + query);
 
         request.setEncoding("utf8");
 

@@ -1,6 +1,7 @@
-var querystring = require("querystring");
+var querystring    = require("querystring");
+var device_control = require("./device_control");
 
-function start(response, postedData) 
+function start(query, data, response) 
 {
     console.log("Request handler 'start' was called.");
 
@@ -22,7 +23,7 @@ function start(response, postedData)
     response.end();
 }
 
-function ping(response, postedData) 
+function ping(query, data, response) 
 {
     console.log("PING!");
     response.writeHead(200, {"Content-Type": "text/plain"});
@@ -30,27 +31,48 @@ function ping(response, postedData)
     response.end();
 }
 
-function report_state(response, postedData) 
+// Uses JSON to report device state
+function report_state(query, data, response) 
 {
     console.log("report_state called...");
 
-    var state = JSON.parse(postedData);
+    var state = JSON.parse(data);
     console.log(state);
+
+    device_control.set_state(state);
 
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("report_state request received!");
     response.end();
 }
 
-function upload(response, postedData) 
+// Simple user interface with query strings
+function set_state(query, data, response) 
+{
+    console.log("set_state called...");
+
+    var state = querystring.parse(query);
+    console.log(query);
+    console.log(state);
+    console.log(data);
+
+    device_control.set_state(state);
+
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.write("set_state request received!");
+    response.end();
+}
+
+function upload(query, data, response) 
 {
     console.log("Request handler 'upload' was called.");
     response.writeHead(200, {"Content-Type": "text/plain"});
-    response.write("Posted data: " + querystring.parse(postedData).text);
+    response.write("Posted data: " + querystring.parse(data).text);
     response.end();
 }
 
 exports.start        = start;
 exports.report_state = report_state;
+exports.set_state    = set_state;
 exports.ping         = ping;
 exports.upload       = upload;
