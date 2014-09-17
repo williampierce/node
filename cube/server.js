@@ -23,6 +23,7 @@ function start(route, handle)
 
         console.log("Request for " + pathname + " received.");
         console.log("  Method: " + request.method);
+        console.log("  URL: " + request.url);
         console.log("  Pathname: " + pathname);
         console.log("  Query: " + query);
 

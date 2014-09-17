@@ -1,21 +1,29 @@
 var http = require('http');
 
-function set_state(state)
+// Send request to update device state
+// Uses agent id to determine URL; sends device state as JSON
+//     state
+//         agent: <agent id string>
+//         face:  1..6
+function setState(state)
 {
-    var json_state = JSON.stringify(state);
+    var jsonState = JSON.stringify(state);
 
     var headers = {
         'Content-Type': 'application/json',
-        'Content-Length': json_state.length
+        'Content-Length': jsonState.length
     };
 
     var options = {
         host: 'agent.electricimp.com',
         port: 80,
-        path: '/ck2d15weoILd/set_state',
+        // Example path: '/ck2d15weoILd/setState',
+        path: '/' + state.agent + '/setState',
         method: 'POST',
         headers: headers
     };
+
+    console.log(options);
 
     var request = http.request(options, function(res) {
             console.log('STATUS: ' + res.statusCode);
@@ -27,14 +35,14 @@ function set_state(state)
             });
 
     console.log(state);
-    console.log(json_state);
+    console.log(jsonState);
 
     request.on('error', function(e) {
             console.log('Error: ' + e);
             });
 
-    request.write(json_state);
+    request.write(jsonState);
     request.end();
 }
 
-exports.set_state = set_state;
+exports.setState = setState;

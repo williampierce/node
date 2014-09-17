@@ -3,11 +3,14 @@ var router = require("./router");
 var requestHandlers = require("./requestHandlers");
 
 var handle = {}
-handle["/"]             = requestHandlers.start;
-handle["/ping"]         = requestHandlers.ping;
-handle["/report_state"] = requestHandlers.report_state;
-handle["/set_state"]    = requestHandlers.set_state;
-handle["/start"]        = requestHandlers.start;
-handle["/upload"]       = requestHandlers.upload;
+
+// Test/debug
+handle["/ping"]        = requestHandlers.ping;
+
+// Agent requests
+handle["/reportState"] = requestHandlers.reportState;
+
+// User requests
+handle["/setState"]    = requestHandlers.setState;
 
 server.start(router.route, handle);
