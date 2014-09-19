@@ -12,23 +12,21 @@ function start(route, handle)
 
         function postData(chunk)
         {
+            console.log("Received POST data chunk '" + chunk + "'");
             postedData += chunk;
-            console.log("Received POST data chunk '" + chunk + "'.");
         }
 
         function postEnd()
         {
+            // End of posted data; route request
             route(handle, pathname, query, postedData, response);
         }
 
-        console.log("Request for " + pathname + " received.");
-        console.log("  Method: " + request.method);
-        console.log("  URL: " + request.url);
-        console.log("  Pathname: " + pathname);
-        console.log("  Query: " + query);
+        console.log("HTTP " + request.method + " request for " + pathname + " received");
+        if(query)
+            console.log("  Query: " + query);
 
         request.setEncoding("utf8");
-
         request.addListener("data", postData);
         request.addListener("end",  postEnd);
     }
