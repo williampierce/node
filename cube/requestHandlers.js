@@ -3,24 +3,27 @@
 // Provide a function for each type of request, as determined by the router, typically
 // by examining the pathname.
 
+var util        = require("util");
 var querystring = require("querystring");
 var logic       = require("./logic");     // business logic
 
-// Debug
-function ping(query, data, response) 
+
+// *** Test/Debug ***
+function test(request, query, data, response) 
 {
-    console.log("PING!");
+    console.log("Test request...");
     response.writeHead(200, {"Content-Type": "text/plain"});
-    response.write("PING received!");
-    response.end();
+    response.write(util.inspect(request.headers));
+    response.end("\r\nOK (test)");
 }
+
 
 // *** Device/Agent to Server ***
 
 // Agent reports device state using JSON
 //     agent_id: <string>
 //     face:     1..6
-function reportState(query, data, response) 
+function reportState(request, query, data, response) 
 {
     // console.log("Function reportState called, updating state...");
 
@@ -33,13 +36,14 @@ function reportState(query, data, response)
     response.end("OK (reportState)");
 }
 
+
 // *** Operator to Server ***
 
 // Operator sets device state using a query string
 //     <server>/setState?agent_id=<string>&face=<1..6>
 //
 // For test, probably not needed longterm.
-function setState(query, data, response) 
+function setState(request, query, data, response) 
 {
     console.log("Function setState called...");
 
@@ -54,6 +58,6 @@ function setState(query, data, response)
     response.end("OK (setState)");
 }
 
-exports.ping        = ping;
+exports.test        = test;
 exports.reportState = reportState;
 exports.setState    = setState;

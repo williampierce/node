@@ -5,7 +5,7 @@ var requestHandlers = require("./requestHandlers");
 var handle = {}
 
 // Test/debug
-handle["/ping"]        = requestHandlers.ping;
+handle["/test"]        = requestHandlers.test;
 
 // Agent requests
 handle["/reportState"] = requestHandlers.reportState;
