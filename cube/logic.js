@@ -1,6 +1,11 @@
 // Contains the business logic. Maintains state based on inputs; updates device state.
+//
+// In the initial design, the operator does not control the devices. The state of each device
+// is determined by the rules captured here, and the operator's dashboard just provides the
+// state of the devices.
 
 var deviceControl = require("./deviceControl");
+var clientMgr     = require("./clientMgr");
 
 // Current state of all devices
 //     Map: agentId -> {timeStamp: <time>, face : 1..6}
@@ -14,6 +19,24 @@ var g_faceToAgentMap = {0:{}, 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}};
 // Current majority face
 var g_majorityFace = 0;
 
+
+// getNetworkState()
+//     { majorityFace: <int>,
+//       numDevices: <int>,
+//       agentStates: g_agentState,
+//       faceToAgentMap: g_faceToAgentMap,
+//     }
+function getNetworkState()
+{
+    var networkState = {};
+
+    networkState.majorityFace   = g_majorityFace;
+    networkState.numDevices     = g_agentState.length;
+    networkState.agentState     = g_agentState;
+    networkState.faceToAgentMap = g_faceToAgentMap;
+
+    return networkState;
+}
 
 function updateState(state)
 {
@@ -61,10 +84,12 @@ function updateState(state)
     g_agentState[agentId].timeStamp = timeStamp;
 
 
-    // 2. Compute the majority face and update all devices if it has changed
+    // 2. Compute the majority face
     var majorityFace = getMajorityFace();
-
+ 
+    // 3. Update all devices if majority face has changed
     if(majorityFace != g_majorityFace)
+
     {
         g_majorityFace = majorityFace;
 
@@ -75,6 +100,13 @@ function updateState(state)
             deviceControl.setState(state);
         }
     }
+
+    // 4. Always update the client dashboard
+    var networkState = {
+        "majority"       : g_majorityFace,
+        "faceToAgentMap" : g_faceToAgentMap
+    };
+    clientMgr.broadcastState(networkState);
 }
 
 // Ties will go to the lower numbered face
@@ -102,4 +134,6 @@ function getMajorityFace()
     return maxFace;
 }
 
-exports.updateState = updateState;
+exports.getNetworkState = getNetworkState;
+exports.updateState     = updateState;
+

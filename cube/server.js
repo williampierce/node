@@ -1,8 +1,15 @@
-var http = require('http');
-var url  = require('url');
-var fs   = require('fs');
-var path = require('path');
+var http      = require('http');
+var url       = require('url');
+var fs        = require('fs');
+var path      = require('path');
+var clientMgr = require('./clientMgr');
 
+var g_serverPort = 8765;
+
+// Given a routing function and a mapping from pathnames to request handlers, this
+// function will create a server to handle http requests on port g_serverPort.
+// If a pathname has the form "/static/<page>", then the specified page will be
+// delivered and no handler will be called.
 function start(route, handle)
 {
     function onRequest(request, response)
@@ -35,8 +42,37 @@ function start(route, handle)
         request.addListener("end",  postEnd);
     }
 
-    http.createServer(onRequest).listen(8765); 
-    console.log('Server running on port 8765');
+    var server = http.createServer(onRequest);
+    server.listen(g_serverPort); 
+
+    // Set up socket.io
+    var io = require('socket.io')(server);
+
+    io.on("connect", function(socket){
+        socket.emit("ack", "Welcome, socket number " + socket.id + " !");
+
+        // Register the socket with the client manager
+        clientMgr.register(socket);
+
+        // Send the date every second
+        /*
+        setInterval(function(){
+            clientMgr.broadcastState({});
+            // socket.emit("date", {"date": new Date()});
+        }, 1000);
+        */
+
+        // Capture client events
+        socket.on("client_data", function(data){
+            process.stdout.write(data.letter);
+        });
+
+        socket.on("disconnect", function(){
+            clientMgr.deRegister(socket);
+        });
+    });
+
+    console.log('Server running on port ' + g_serverPort);
 }
 
 function serveStaticPage(request, pathname, response)
@@ -65,5 +101,5 @@ function serveStaticPage(request, pathname, response)
     return false;
 }
 
-exports.start= start;
+exports.start = start;
 

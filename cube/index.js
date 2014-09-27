@@ -5,12 +5,13 @@ var requestHandlers = require("./requestHandlers");
 var handle = {}
 
 // Test/debug
-handle["/test"]        = requestHandlers.test;
+handle["/test"]            = requestHandlers.test;
 
 // Agent requests
-handle["/reportState"] = requestHandlers.reportState;
+handle["/reportState"]     = requestHandlers.reportState;
 
 // User requests
-handle["/setState"]    = requestHandlers.setState;
+handle["/getNetworkState"] = requestHandlers.getNetworkState;
+handle["/setState"]        = requestHandlers.setState;
 
 server.start(router.route, handle);
